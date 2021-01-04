@@ -15,7 +15,8 @@
     "standard": "^16.0.3"
   },
   "scripts": {
-    "test": "jest"
+    "test": "jest --watchAll",
+    "test:staged": "jest"
   },
   "dependencies": {
     "@types/jest": "^26.0.19"
