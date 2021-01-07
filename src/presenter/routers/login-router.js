@@ -6,7 +6,7 @@ module.exports = class LoginRouter {
   }
 
   route (httpRequest) {
-    if (!httpRequest?.body) {
+    if (!httpRequest?.body || !this.authUseCase?.auth) {
       return HttpResponse.serverErro
     }
 
