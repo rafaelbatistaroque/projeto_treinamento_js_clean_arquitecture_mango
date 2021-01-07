@@ -9,7 +9,7 @@ module.exports = class HttpResponse {
     }
   }
 
-  static get serverErro () {
+  static serverErro () {
     return { statusCode: 500 }
   }
 
@@ -18,5 +18,9 @@ module.exports = class HttpResponse {
       statusCode: 401,
       body: new UnauthorizedError()
     }
+  }
+
+  static ok () {
+    return { statusCode: 200 }
   }
 }
