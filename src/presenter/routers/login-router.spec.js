@@ -36,7 +36,7 @@ const makeEmailValidator = () => {
 }
 
 const makeSut = () => {
-  const authUseCaseSpy = new AuthUseCaseSpy()
+  const authUseCaseSpy = makeAuthUseCase()
   const emalValidatorSpy = makeEmailValidator()
   authUseCaseSpy.accessToken = 'valid_token'
   const sut = new LoginRouter(authUseCaseSpy, emalValidatorSpy)
@@ -45,6 +45,11 @@ const makeSut = () => {
     authUseCaseSpy,
     sut
   }
+}
+
+const makeAuthUseCase = () => {
+  const authUseCaseSpy = new AuthUseCaseSpy()
+  return authUseCaseSpy
 }
 
 const makeAuthUseCaseWithError = () => {
@@ -94,6 +99,36 @@ describe('Login Router', () => {
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('password'))
+  })
+
+  test('Should return 500 if no EmailValidator is provided', async () => {
+    const authUseCase = makeAuthUseCase()
+    const sut = new LoginRouter(authUseCase)
+    const httpRequest = {
+      body: {
+        email: 'any_email',
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
+  })
+
+  test('Should return 500 if no EmailValidator has no isValid method', async () => {
+    const authUseCase = makeAuthUseCase()
+    const sut = new LoginRouter(authUseCase, {})
+    const httpRequest = {
+      body: {
+        email: 'any_email',
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError())
   })
 
   test('Should return 500 if no httpRequest is provided', async () => {
@@ -183,7 +218,7 @@ describe('Login Router', () => {
     expect(httpResponse.body).toEqual(new ServerError())
   })
 
-  test('Should return 500 if AuthUseCase has no auth method', async () => {
+  test('Should return 500 if AuthUseCase throw exception', async () => {
     const { sutError } = makeAuthUseCaseWithError()
     const httpRequest = {
       body: {
