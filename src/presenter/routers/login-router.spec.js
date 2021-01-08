@@ -1,4 +1,5 @@
 const MissingParamError = require('../helpers/missing-param-error')
+const InvalidParamError = require('../helpers/invalid-param-error')
 const ServerError = require('../helpers/server-error')
 const UnauthorizedError = require('../helpers/unauthorized-error')
 const LoginRouter = require('./login-router')
@@ -22,11 +23,25 @@ class AuthUseCaseSpyError extends AuthUseCaseAbstract {
   }
 }
 
+class EmailValidatorSpy {
+  isValid (email) {
+    return this.isEmailValid
+  }
+}
+
+const makeEmailValidator = () => {
+  const emailValidatorSpy = new EmailValidatorSpy()
+  emailValidatorSpy.isEmailValid = true
+  return emailValidatorSpy
+}
+
 const makeSut = () => {
   const authUseCaseSpy = new AuthUseCaseSpy()
+  const emalValidatorSpy = makeEmailValidator()
   authUseCaseSpy.accessToken = 'valid_token'
-  const sut = new LoginRouter(authUseCaseSpy)
+  const sut = new LoginRouter(authUseCaseSpy, emalValidatorSpy)
   return {
+    emalValidatorSpy,
     authUseCaseSpy,
     sut
   }
@@ -52,6 +67,21 @@ describe('Login Router', () => {
     const httpResponse = await sut.route(httpRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new MissingParamError('email'))
+  })
+
+  test('Should return 400 if an invalid email is provided', async () => {
+    const { sut, emalValidatorSpy } = makeSut()
+    emalValidatorSpy.isEmailValid = false
+    const httpRequest = {
+      body: {
+        email: 'invalid_email',
+        password: 'any_password'
+      }
+    }
+
+    const httpResponse = await sut.route(httpRequest)
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new InvalidParamError('email'))
   })
 
   test('Should return 400 if no password is provided', async () => {
