@@ -15,8 +15,8 @@
     "standard": "^16.0.3"
   },
   "scripts": {
-    "test": "jest --watchAll",
-    "test:staged": "jest --passWithNoTests"
+    "test": "jest --watch --silent --noStackTrace",
+    "test:staged": "jest --passWithNoTests --findRelatedTests --noStackTrace -silent"
   },
   "dependencies": {
     "@types/jest": "^26.0.19"
