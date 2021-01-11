@@ -22,6 +22,7 @@
     "test:ci": "yarn test --coverage"
   },
   "dependencies": {
-    "@types/jest": "^26.0.19"
+    "@types/jest": "^26.0.19",
+    "validator": "^13.5.2"
   }
 }
