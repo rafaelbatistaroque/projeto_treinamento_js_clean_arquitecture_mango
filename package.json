@@ -15,9 +15,10 @@
     "standard": "^16.0.3"
   },
   "scripts": {
-    "test": "jest --watch --silent --noStackTrace",
-    "test:staged": "jest --passWithNoTests --findRelatedTests --noStackTrace -silent",
-    "test:ci": "jest --coverage --silent --noStackTrace"
+    "test": "jest --silent --noStackTrace --passWithNoTests",
+    "test:unit": "yarn test --watchAll",
+    "test:staged": "yarn test --findRelatedTests",
+    "test:ci": "yarn test --coverage"
   },
   "dependencies": {
     "@types/jest": "^26.0.19"
